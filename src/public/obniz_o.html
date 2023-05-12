@@ -1,0 +1,151 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://obniz.com/js/jquery-3.2.1.min.js"></script>
+    <script src="https://unpkg.com/obniz/obniz.js"></script>
+    <title>LEDとマイク</title>
+  </head>
+  <style>
+    body {
+      text-align: center;
+      background-color: #bbbec2;
+    }
+
+    button {
+      text-align: center;
+      margin: auto;
+      position: relative;
+      border-radius: 12px;
+      border: 3px solid #000000;
+      box-shadow: 0 5px 0 #585a5c;
+      font-size: 1.5rem;
+    }
+
+    button:active {
+      box-shadow: none;
+      transform: translateY(5px);
+    }
+
+    #naiyou {
+      font-weight: 600;
+    }
+
+    #hyouzi {
+      text-align: center;
+      font-size: 3rem;
+    }
+  </style>
+  <body>
+    <header>
+      <div id="obniz-debug"></div>
+    </header>
+    <h1>～LEDとマイクで遊ぼう～</h1>
+    <p id="naiyou">
+      赤・青・黄色・緑・オレンジ・ピンク・水色・黄緑・紫という言葉を話すとLEDの色が変わるよ<br />
+      いろいろ試してみよう！
+    </p>
+    <p><button id="hanasu">話す</button></p>
+    <p id="hyouzi"></p>
+    <button id="modoru" onclick="btn()">ホームに戻る</button>
+    <script>
+      const obniz = new Obniz("9217-3100");
+      const LED_length = 15;
+      let leds;
+
+      obniz.onconnect = async function () {
+        leds = obniz.wired("WS2812", { din: 26 });
+      };
+
+      function ledon(color) {
+        let ledlist = [];
+        for (let i = 0; i < LED_length; i++) {
+          ledlist.push(color);
+        }
+        leds.rgbs(ledlist);
+      }
+
+      function btn() {
+        window.location.href = "./obniz_h.html";
+      }
+
+      let hanasu = document.querySelector("#hanasu");
+      let hyouzi = document.querySelector("#hyouzi");
+
+      let rec = new webkitSpeechRecognition();
+      rec.continuous = true;
+      rec.interimResults = false;
+      rec.lang = "ja-JP";
+
+      let stopped = true;
+
+      hanasu.onclick = function () {
+        if (stopped == true) {
+          hyouzi.innerHTML = "";
+          rec.start();
+        } else {
+          rec.stop();
+        }
+      };
+
+      rec.onstart = function () {
+        console.log("on start");
+      };
+
+      rec.onend = function () {
+        console.log("on end");
+      };
+
+      rec.onresult = function (e) {
+        rec.stop();
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) {
+            console.log(e);
+            let text = e.results[i][0].transcript;
+            console.log(text);
+
+            if (text == "赤") {
+              hyouzi.innerHTML = text;
+              hyouzi.style.color = "red";
+              ledon([0x99, 0x00, 0x00]);
+            } else if (text == "オレンジ") {
+              hyouzi.innerHTML = text;
+              hyouzi.style.color = "orange";
+              ledon([0xff, 0x66, 0x00]);
+            } else if (text == "青") {
+              hyouzi.innerHTML = text;
+              hyouzi.style.color = "blue";
+              ledon([0x00, 0x00, 0x99]);
+            } else if (text == "水色") {
+              hyouzi.innerHTML = text;
+              hyouzi.style.color = "deepskyblue";
+              ledon([0x66, 0xcc, 0xff]);
+            } else if (text == "緑") {
+              hyouzi.innerHTML = text;
+              hyouzi.style.color = "green";
+              ledon([0x00, 0x66, 0x00]);
+            } else if (text == "黄緑") {
+              hyouzi.innerHTML = text;
+              hyouzi.style.color = "greenyellow";
+              ledon([0x99, 0xff, 0x00]);
+            } else if (text == "黄色") {
+              hyouzi.innerHTML = text;
+              hyouzi.style.color = "yellow";
+              ledon([0x66, 0x66, 0x00]);
+            } else if (text == "紫") {
+              hyouzi.innerHTML = text;
+              hyouzi.style.color = "darkviolet";
+              ledon([0x99, 0x00, 0xff]);
+            } else if (text == "ピンク") {
+              hyouzi.innerHTML = text;
+              hyouzi.style.color = "hotpink";
+              ledon([0xff, 0x00, 0x99]);
+            } else {
+              hyouzi.innerHTML = "もう一度話してね";
+              hyouzi.style.color = "white";
+            }
+          }
+        }
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LEDとスマホ</title>
+    <script src="https://obniz.com/js/jquery-3.2.1.min.js"></script>
+    <script src="https://unpkg.com/obniz/obniz.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+  </head>
+  <style>
+    body {
+      text-align: center;
+      background-color: #e48c99;
+    }
+
+    button {
+      text-align: center;
+      margin: auto;
+      position: relative;
+      border-radius: 12px;
+      border: 3px solid #000000;
+      box-shadow: 0 5px 0 #585a5c;
+      font-size: 1.5rem;
+    }
+
+    button:active {
+      box-shadow: none;
+      transform: translateY(5px);
+    }
+
+    img {
+      margin-top: 10px;
+      position: absolute;
+      display: flex;
+      justify-content: flex-start;
+      width: 260px;
+      height: 260px;
+    }
+
+    #naiyou {
+      font-weight: 600;
+    }
+  </style>
+  <body>
+    <header>
+      <div id="obniz-debug"></div>
+    </header>
+    <img src="qrcode_9dux64.sse.codesandbox.io.png" />
+    <h1>～LEDとスマホで遊ぼう～</h1>
+    <p id="naiyou">
+      QRコードをスマホで読み込んで接続ボタンを押してね。<br />
+      その後にスタートボタンを押すと遊べるよ。<br />
+      四角をキャンバスのどこかに持っていくとLEDが光って模様が出るよ。<br />
+      スマホを傾けてLEDを光らそう！<br />
+    </p>
+    <div>
+      <div>あなたのID: <span id="myid"></span></div>
+      <div>
+        ルームID: <input id="room" type="text" size="10" value="room001" />
+      </div>
+    </div>
+    <p>
+      <button id="connect">スタート</button>
+      <button id="ichi" onclick="window.location.reload();">もう一度</button>
+      <button id="modoru" onclick="bt()">ホームに戻る</button>
+    </p>
+    <script>
+      let socket = io.connect();
+      let myid;
+
+      let room = document.querySelector("#room").value;
+      let btn = document.querySelector("#connect");
+
+      let g = 0;
+      let b = 0;
+      let x = 300;
+      let y = 300;
+
+      let pointX = 0;
+      let pointY = 0;
+
+      btn.addEventListener("click", function () {
+        socket.emit("join", room);
+        ledon([0x00, 0x00, 0x00]);
+      });
+
+      socket.on("mylogin", function (data) {
+        myid = data;
+        document.querySelector("#myid").innerHTML = myid;
+        console.log("あなたのID: ", myid);
+      });
+
+      socket.on("sensor", function (data) {
+        g = data.g;
+        b = data.b;
+      });
+
+      const obniz = new Obniz("9217-3100");
+      const LED_length = 15;
+      let leds;
+
+      obniz.onconnect = async function () {
+        leds = obniz.wired("WS2812", { din: 26 });
+      };
+
+      function ledon(color) {
+        let ledlist = [];
+        for (let i = 0; i < LED_length; i++) {
+          ledlist.push(color);
+        }
+        leds.rgbs(ledlist);
+      }
+
+      function bt() {
+        window.location.href = "./obniz_h.html";
+      }
+
+      function setup() {
+        createCanvas(600, 600);
+        background(200);
+        pointX = random(width);
+        pointY = random(height);
+      }
+
+      function draw() {
+        background(200);
+        noStroke();
+        rectMode(CENTER);
+        rect(x, y, 50, 50);
+        x = x + 0.05 * parseFloat(g);
+        y = y + 0.05 * parseFloat(b);
+        if (x >= 0 && x <= 200 && y >= 0 && y <= 200) {
+          ledon([0x66, 0x66, 0x00]);
+          fill(242, 211, 36);
+          noStroke();
+          circle(50, 300, 50);
+          circle(400, 30, 20);
+          circle(100, 500, 50);
+          circle(500, 500, 80);
+          circle(300, 400, 30);
+          circle(pointX, pointY, 80);
+        } else if (x >= 400 && x <= 600 && y >= 400 && y <= 600) {
+          ledon([0x99, 0x00, 0xff]);
+          fill(139, 99, 172);
+          circle(100, 300, 50);
+          circle(40, 100, 20);
+          circle(100, 500, 80);
+          circle(400, 60, 50);
+          circle(300, 400, 30);
+          circle(pointX, pointY, 80);
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,146 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>LEDとカメラ</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+    <script src="https://obniz.com/js/jquery-3.2.1.min.js"></script>
+    <script src="https://unpkg.com/obniz/obniz.js"></script>
+    <style>
+      body {
+        text-align: center;
+        background-color: #efd791;
+      }
+
+      button {
+        text-align: center;
+        margin: auto;
+        position: relative;
+        border-radius: 12px;
+        border: 3px solid #000000;
+        box-shadow: 0 5px 0 #585a5c;
+        font-size: 1.5rem;
+      }
+
+      button:active {
+        box-shadow: none;
+        transform: translateY(5px);
+      }
+
+      h3 {
+        color: #da3737;
+      }
+
+      #naiyou {
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div id="obniz-debug"></div>
+    </header>
+    <h1>～LEDとカメラで遊ぼう～</h1>
+    <p id="naiyou">
+      四角を動かして円に当てにいってみよう！<br />
+      最初からボタンを押すと円が別の場所に移動するよ。
+    </p>
+    <p>
+      <button id="sai" onclick="window.location.reload();">
+        最初から
+      </button>
+      <button id="modoru" onclick="btn()">ホームに戻る</button>
+    </p>
+    <main>
+      <h3 id="mozi"></h3>
+    </main>
+    <script>
+      let text = document.getElementById("mozi");
+
+      const obniz = new Obniz("9217-3100");
+      const LED_length = 15;
+      let leds;
+
+      obniz.onconnect = async function () {
+        leds = obniz.wired("WS2812", { din: 26 });
+      };
+
+      function ledon(color) {
+        let ledlist = [];
+        for (let i = 0; i < LED_length; i++) {
+          ledlist.push(color);
+        }
+        leds.rgbs(ledlist);
+      }
+
+      function btn() {
+        window.location.href = "./obniz_h.html";
+      }
+
+      let facemesh;
+      let video;
+      let predictions = [];
+      let positionX = 0;
+      let positionY = 0;
+
+      function setup() {
+        createCanvas(640, 480);
+        video = createCapture(VIDEO);
+        video.size(width, height);
+
+        facemesh = ml5.facemesh(video, modelReady);
+
+        positionX = random(width);
+        positionY = random(height);
+
+        facemesh.on("predict", (results) => {
+          predictions = results;
+        });
+
+        video.hide();
+      }
+
+      function modelReady() {
+        console.log("Model ready!");
+      }
+
+      function draw() {
+        image(video, 0, 0, width, height);
+
+        fill(0, 255, 0);
+        circle(positionX, positionY, 50);
+
+        drawKeypoints();
+      }
+
+      function drawKeypoints() {
+        for (let i = 0; i < predictions.length; i += 1) {
+          const keypoints = predictions[i].scaledMesh;
+
+          const [x, y] = keypoints[5];
+          rectMode(CENTER);
+          fill(0, 0, 255);
+          rect(x, y, 50, 50);
+
+          if (
+            Math.sqrt(
+              (positionX - x) * (positionX - x) +
+                (positionY - y) * (positionY - y)
+            ) < 25
+          ) {
+            fill(255, 0, 0);
+            circle(positionX, positionY, 50);
+            fill(255, 0, 0);
+            rect(x, y, 50, 50);
+            ledon([0x66, 0x00, 0x00]);
+            text.innerHTML = "当たった！";
+          } else {
+            fill(255, 255, 255);
+            ledon([0x00, 0x00, 0x00]);
+            text.innerHTML = "";
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

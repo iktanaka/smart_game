@@ -1,0 +1,28 @@
+body {
+  font-family: "M PLUS Rounded 1c", sans-serif;
+}
+
+input {
+  border: double 4px #806c68;
+}
+
+button {
+  text-align: CENTER;
+  color: #fff;
+  margin: 10px;
+  background: #d96e59;
+  border-radius: 100vh;
+  border-style: none;
+  box-shadow: 2px 5px 1px #806c68;
+  position: relative;
+  padding: 10px 25px;
+  transition: 0.3s ease-in-out;
+  font-family: "M PLUS Rounded 1c", sans-serif;
+}
+
+button:active {
+  box-shadow: none;
+  color: #fff;
+  position: relative;
+  top: 3px;
+}

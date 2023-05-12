@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://obniz.com/js/jquery-3.2.1.min.js"></script>
+    <script src="https://unpkg.com/obniz/obniz.js"></script>
+    <title>説明</title>
+  </head>
+  <style>
+    body {
+      text-align: center;
+      background-color: #88B1D2;
+    }
+
+    button {
+      text-align: center;
+      margin: auto;
+      position: relative;
+      border-radius: 12px;
+      border: 3px solid #000000;
+      box-shadow: 0 5px 0 #585a5c;
+      font-size: 1.5rem;
+    }
+
+    button:active {
+      box-shadow: none;
+      transform: translateY(5px);
+    }
+  </style>
+  <body>
+    <h1>カメラで遊ぶ</h1>
+    <p>
+      LEDとカメラを組み合わせた作品です。<br />
+      画面に表示される青色の四角を動かして、緑色の円に当てる遊びになります。<br />
+      鼻の部分に四角が表示されるため、顔を動かすことで円に当てることができます。<br />
+      四角と円が当たると、LEDが光ります。<br />
+      その他にも、四角と円の色が変わる、文字が表示されるといった変化が起こります。<br />
+      円はランダムな位置に表示されるようになっていて、最初からボタンを押すと別の位置で円が表示されるため、何回でも遊ぶことができます。<br/><br/>
+    </p>
+    <h1>マイクで遊ぶ</h1>
+    <p>
+      LEDとマイクを組み合わせた作品です。<br />
+      話すボタンを押してから色の名前を言うと、その色のLEDに光るという仕組みになっています。<br />
+      また、画面には、色の名前がその色の文字で表示されるという工夫もしています。<br />
+      ぜひ、色の変化を楽しんでほしいと思います。<br/><br/>
+    </p>
+    <h1>スマホで遊ぶ</h1>
+    <p>
+      スマホの傾きとLEDを組み合わせた作品です。<br/>
+      QRコードをスマホで読み取り、接続ボタンを押します。<br/>
+      その後、パソコンの画面に表示されているスタートボタンを押すことで遊ぶことができます。<br/>
+      そして、キャンバスに表示されている四角をスマホで動かします。<br/>
+      キャンバスのどこかに四角を持っていくとLEDが光る仕組みになっています。<br/>
+      また、模様も表示されるようになっていて、模様の一部分だけランダムで表示されるという工夫をすることで、模様の変化を楽しめるようにしています。<br/>
+      もう一度ボタンを押すと、もう一度遊ぶことができます。</br></br>
+    </p>
+    <button id="modoru" onclick="btn()">戻る</button>
+  </body>
+  <script>
+    function btn() {
+        window.location.href = "./obniz_h.html";
+      }
+  </script>
+</html>
